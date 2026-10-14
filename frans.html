@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="nl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Frans Woorden Avontuur</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:"Comic Sans MS","Trebuchet MS",Arial,sans-serif;background:linear-gradient(160deg,#4facfe,#8e44ad);min-height:100vh;color:#222;user-select:none}
+#app{max-width:1000px;margin:0 auto;padding:12px}
+h1{color:#fff;text-align:center;font-size:clamp(28px,5vw,48px);text-shadow:3px 3px 0 #ff6b6b;margin:10px 0}
+h2{text-align:center;color:#fff;text-shadow:2px 2px 0 #333;font-size:clamp(22px,4vw,34px);margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.big{border:none;border-radius:22px;padding:22px 10px;font-size:24px;font-weight:bold;color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.25);font-family:inherit;transition:transform .1s}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.big small{display:block;font-size:15px;font-weight:normal;margin-top:6px}
+.c1{background:#ff6b6b}.c2{background:#f9a825}.c3{background:#2ecc71}.c4{background:#00b3d6}.c5{background:#e84393}.c6{background:#6c5ce7}.c7{background:#fd7e14}.c8{background:#16a085}
+.btn{border:none;border-radius:14px;padding:12px 18px;font-size:20px;font-weight:bold;cursor:pointer;background:#fff;color:#6c5ce7;margin:5px;font-family:inherit;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.btn:active{transform:translateY(3px)}
+.bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;color:#fff;font-size:20px;font-weight:bold;margin-bottom:8px}
+.panel{background:#fff;border-radius:22px;padding:18px;box-shadow:0 8px 20px rgba(0,0,0,.2);text-align:center}
+.card{perspective:1000px;width:min(420px,92vw);height:300px;margin:10px auto;cursor:pointer}
+.inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.card.flip .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.back{transform:rotateY(180deg);background:#fff8dc}
+.flag{font-size:80px;line-height:1}
+.name{font-size:36px;font-weight:bold;color:#6c5ce7}
+.fact{font-size:18px;color:#444;margin-top:10px}
+.q{font-size:clamp(22px,4vw,32px);font-weight:bold;margin:10px 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font-size:clamp(18px,3.5vw,26px);padding:18px 8px;border-radius:16px;border:none;background:#74b9ff;color:#fff;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 5px 0 #0984e3}
+.opt.ok{background:#2ecc71;box-shadow:0 5px 0 #1e8449}.opt.bad{background:#e74c3c;box-shadow:0 5px 0 #922b21}
+canvas{display:block;width:100%;border-radius:18px;background:#0b1026;touch-action:none}
+.mem{display:grid;gap:8px;grid-template-columns:repeat(4,1fr)}
+.mc{min-height:80px;border-radius:14px;background:#6c5ce7;color:#fff;font-weight:bold;font-size:clamp(14px,2.6vw,20px);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:4px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.mc.open{background:#fff;color:#333}.mc.done{background:#2ecc71;color:#fff;opacity:.75}
+table{width:100%;border-collapse:collapse;font-size:18px}td,th{padding:6px;border-bottom:1px solid #eee}
+.stars{color:#f9a825;font-size:22px;letter-spacing:2px}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10}
+#overlay .panel{max-width:440px;width:92%}
+input{font-size:22px;padding:10px;border-radius:12px;border:3px solid #6c5ce7;width:80%;font-family:inherit;text-align:center}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+.rec{font-size:34px;color:#e84393;font-weight:bold;animation:pop .6s infinite alternate}
+@keyframes pop{from{transform:scale(1)}to{transform:scale(1.15)}}
+.shake{animation:sh .3s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+body{background:linear-gradient(160deg,#4facfe,#e84393)}
+input,textarea{user-select:text;-webkit-user-select:text}
+textarea{width:100%;min-height:120px;font-size:18px;border-radius:12px;border:3px solid #6c5ce7;padding:10px;font-family:inherit}
+.c9{background:#0984e3}.c10{background:#d63031}.c0{background:#2d3436}
+.acc{margin:8px 0}.ab{font-size:22px;min-width:46px;padding:8px;margin:3px;border-radius:10px;border:none;background:#ffeaa7;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.row2{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}.row2 input{width:min(320px,80vw)}
+.plus{font-size:34px;width:64px;height:64px;border-radius:50%;border:none;background:#2ecc71;color:#fff;font-weight:bold;cursor:pointer;box-shadow:0 5px 0 #1e8449}
+.lvl{background:rgba(255,255,255,.25);border-radius:16px;padding:10px;color:#fff;font-weight:bold;text-align:center;margin-bottom:12px}
+.lvlbar{height:18px;background:rgba(0,0,0,.25);border-radius:9px;overflow:hidden;margin-top:6px}.lvlbar div{height:100%;background:linear-gradient(90deg,#ffd32a,#2ecc71)}
+.seg button{border:none;padding:10px 14px;font-size:17px;font-weight:bold;font-family:inherit;cursor:pointer;background:#fff;color:#6c5ce7;border-radius:12px;margin:3px}.seg button.on{background:#6c5ce7;color:#fff}
+.sm{font-size:16px;padding:8px 10px}.lrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;border-bottom:1px solid #eee;padding:8px 0;text-align:left}.lrow .nm{flex:1;font-size:20px;font-weight:bold;min-width:150px}
+.hint{font-size:28px;letter-spacing:4px;color:#e84393;font-weight:bold;min-height:36px}
+.word{font-size:clamp(28px,6vw,46px);letter-spacing:6px;font-weight:bold;color:#6c5ce7;margin:12px 0}
+.kb button{font-size:22px;min-width:44px;padding:8px;margin:3px;border:none;border-radius:10px;background:#74b9ff;color:#fff;font-weight:bold;cursor:pointer;font-family:inherit}.kb button:disabled{background:#ccc}
+.fbok{color:#1e8449}.fbbad{color:#c0392b}.fbmid{color:#e67e22}
+#confetti{background:transparent;border-radius:0;width:100%;height:100%}
+</style></head><body>
+<canvas id="confetti"></canvas>
+<div id="app"></div>
+<div id="overlay"><div class="panel" id="ovp"></div></div>
+<script>
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var app=$("app");
+function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function qa(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));}
+// ---------- storage ----------
+var ST={get:function(k,d){try{var v=localStorage.getItem("frw_"+k);return v?JSON.parse(v):d;}catch(e){return d;}},set:function(k,v){try{localStorage.setItem("frw_"+k,JSON.stringify(v));}catch(e){}}};
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+var EXAMPLE=[["le chien","de hond"],["le chat","de kat"],["l'oiseau","de vogel"],["le cheval","het paard"],["la vache","de koe"],["le poisson","de vis"],["le lapin","het konijn"],["la souris","de muis"],["le cochon","het varken"],["l'éléphant","de olifant"],["la grenouille","de kikker"],["l'écureuil","de eekhoorn"]];
+function mkList(name,pairs,active){return {id:uid(),name:name,active:!!active,words:pairs.map(function(p){return {id:uid(),fr:p[0],nl:p[1]};})};}
+var DB=ST.get("db",null);
+if(!DB||!DB.lists){DB={lists:[mkList("Voorbeeld: dieren",EXAMPLE,true)]};ST.set("db",DB);}
+function save(){ST.set("db",DB);}
+function getList(id){return DB.lists.filter(function(l){return l.id===id;})[0];}
+function activeWords(){var seen={},out=[];DB.lists.forEach(function(l){if(!l.active)return;l.words.forEach(function(w){var k=norm(w.fr)+"|"+norm(w.nl);if(!seen[k]){seen[k]=1;out.push(w);}});});return out;}
+// ---------- parsing ----------
+var SEPS=["\t","=",";"," - "," – "];
+function parseLine(s){s=String(s).replace(/\r/g,"").trim();if(!s||s.charAt(0)==="#")return null;
+ for(var k=0;k<SEPS.length;k++){var i=s.indexOf(SEPS[k]);if(i>0){var a=s.slice(0,i).trim(),b=s.slice(i+SEPS[k].length).trim();if(a&&b)return [a,b];}}return null;}
+function parseText(t){return String(t).split("\n").map(parseLine).filter(Boolean);}
+function exportText(l){return "# Lijst: "+l.name+"\n"+l.words.map(function(w){return w.fr+" = "+w.nl;}).join("\n")+"\n";}
+// ---------- answer checker ----------
+function norm(s){return String(s).toLowerCase().replace(/[’‘`´]/g,"'").replace(/\s+/g," ").trim().replace(/[.!?]+$/,"").trim();}
+function noAcc(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/œ/g,"oe").replace(/æ/g,"ae");}
+var ART=/^(les |le |la |l'|l |une |un |des |du |de la |de l'|het |een |de |d')/;
+function noArt(s){return s.replace(ART,"").trim();}
+function check(inp,target){var a=norm(inp);if(!a)return {r:"wrong",full:target};
+ var alts=[norm(target)].concat(String(target).split("/").map(norm)).filter(Boolean);
+ var i;for(i=0;i<alts.length;i++)if(a===alts[i])return {r:"ok",full:target};
+ for(i=0;i<alts.length;i++)if(noArt(a)===noArt(alts[i]))return {r:"article",full:target};
+ for(i=0;i<alts.length;i++)if(noAcc(a)===noAcc(alts[i])||noAcc(noArt(a))===noAcc(noArt(alts[i])))return {r:"accent",full:target};
+ return {r:"wrong",full:target};}
+function checkMsg(c){if(c.r==="ok")return '<span class="fbok">Super! ✔</span>';
+ if(c.r==="article")return '<span class="fbok">Goed! 👍 Volledig is het: <b>'+esc(c.full)+'</b></span>';
+ if(c.r==="accent")return '<span class="fbmid">Bijna! Let op het accent: <b>'+esc(c.full)+'</b> (halve punten)</span>';
+ return '<span class="fbbad">Oei! Het juiste antwoord is <b>'+esc(c.full)+'</b></span>';}
+// ---------- progress / stars ----------
+function prog(id){return ST.get("prog",{})[id]||{g:0,f:0};}
+function stars(id){var r=prog(id),s=r.g-r.f;return s>=5?3:s>=3?2:(r.g>=1&&s>=1)?1:0;}
+function mark(w,ok){if(!w)return;var p=ST.get("prog",{});var r=p[w.id]||{g:0,f:0};if(ok)r.g++;else r.f++;p[w.id]=r;ST.set("prog",p);if(ok)addXP(2);}
+function wgt(w){var r=prog(w.id);return 4-stars(w.id)+(r.f>r.g?2:0);}
+function pickW(pool){var tot=0;pool.forEach(function(w){tot+=wgt(w);});var x=Math.random()*tot;for(var i=0;i<pool.length;i++){x-=wgt(pool[i]);if(x<=0)return pool[i];}return pool[pool.length-1];}
+function deck(n){var pool=activeWords(),out=[],avail=pool.slice();while(out.length<n){if(!avail.length)avail=pool.slice();var w=pickW(avail);out.push(w);avail=avail.filter(function(x){return x!==w;});}return out;}
+// ---------- XP / levels / streak ----------
+var TITLES=["Croissant-beginner","Baguette-bakker","Kaas-proever","Crêpe-kampioen","Petit génie","Eiffeltoren-klimmer","Champion des mots","Super Français","Chevalier du vocabulaire","Roi de Paris"];
+function lvlInfo(xp){var lv=1,need=50,base=0;while(xp>=base+need){base+=need;lv++;need=50+(lv-1)*30;}return {lv:lv,cur:xp-base,need:need,title:TITLES[Math.min(lv-1,TITLES.length-1)]};}
+var pendingLvl=0;
+function addXP(n){var x0=ST.get("xp",0),x=x0+n;ST.set("xp",x);if(lvlInfo(x).lv>lvlInfo(x0).lv)pendingLvl=lvlInfo(x).lv;}
+function dkey(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+function yesterday(){var y=new Date();y.setDate(y.getDate()-1);return dkey(y);}
+function touchDay(){var t=dkey(new Date()),s=ST.get("streak",{last:"",n:0});if(s.last===t)return;s.n=s.last===yesterday()?s.n+1:1;s.last=t;ST.set("streak",s);}
+function streakN(){var s=ST.get("streak",{last:"",n:0});return (s.last===dkey(new Date())||s.last===yesterday())?s.n:0;}
+// ---------- direction ----------
+var DIRS={fr2nl:"🇫🇷 → 🇧🇪",nl2fr:"🇧🇪 → 🇫🇷",mix:"🔀 Gemengd"};
+function dirSet(){return ST.get("dir","mix");}
+function qdir(){var d=dirSet();return d==="mix"?(Math.random()<.5?"fr2nl":"nl2fr"):d;}
+function makeQ(w,d){d=d||qdir();var fr=d==="fr2nl";var q={w:w,d:d,prompt:fr?w.fr:w.nl,answer:fr?w.nl:w.fr};
+ var seen=[norm(q.answer)],others=[];sh(activeWords()).forEach(function(x){var v=fr?x.nl:x.fr;if(seen.indexOf(norm(v))<0){seen.push(norm(v));others.push(v);}});
+ q.opts=sh([q.answer].concat(others.slice(0,3)));
+ q.text=fr?"Wat betekent 🇫🇷 "+w.fr+" ?":"Hoe zeg je 🇧🇪 "+w.nl+" in het Frans?";
+ q.short=fr?"Raak de vertaling van: "+w.fr:"Raak het Frans voor: "+w.nl;return q;}
+// ---------- speech ----------
+var voices=[];function loadV(){try{voices=speechSynthesis.getVoices()||[];}catch(e){}}
+if("speechSynthesis" in window){loadV();try{speechSynthesis.onvoiceschanged=loadV;}catch(e){}}
+function canSpeak(){if(!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined")return false;return !voices.length||voices.some(function(v){return /^fr/i.test(v.lang);});}
+function speak(t){if(!canSpeak())return;try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=.85;var v=voices.filter(function(v){return /^fr/i.test(v.lang);})[0];if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
+// ---------- sound ----------
+var muted=ST.get("mute",false),actx=null;
+function tone(f,d,type,delay){if(muted)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();var t=actx.currentTime+(delay||0);var o=actx.createOscillator(),g=actx.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d);}catch(e){}}
+var SFX={ok:function(){tone(660,.12,"square");tone(880,.2,"square",.1);},mid:function(){tone(520,.15,"triangle");},bad:function(){tone(200,.3,"sawtooth");},shot:function(){tone(900,.08,"triangle");},boom:function(){tone(120,.35,"sawtooth");tone(80,.4,"square",.05);},win:function(){[523,659,784,1046].forEach(function(f,k){tone(f,.25,"square",k*.12);});}};
+// ---------- confetti ----------
+var cf=$("confetti"),cx=cf.getContext("2d"),parts=[],cfRun=false;
+function confetti(){cf.width=innerWidth;cf.height=innerHeight;for(var i=0;i<160;i++)parts.push({x:Math.random()*cf.width,y:-20-Math.random()*cf.height*.5,vx:(Math.random()-.5)*4,vy:2+Math.random()*4,c:"hsl("+(Math.random()*360)+",90%,60%)",s:6+Math.random()*8,r:Math.random()*6});if(!cfRun){cfRun=true;requestAnimationFrame(cfl);}}
+function cfl(){cx.clearRect(0,0,cf.width,cf.height);parts=parts.filter(function(p){p.x+=p.vx;p.y+=p.vy;p.r+=.1;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore();return p.y<cf.height+20;});if(parts.length)requestAnimationFrame(cfl);else{cfRun=false;cx.clearRect(0,0,cf.width,cf.height);}}
+// ---------- overlay ----------
+function ov(html){$("ovp").innerHTML=html;$("overlay").style.display="flex";}
+function ovClose(){$("overlay").style.display="none";}
+function ask(title,fields,cb){ov('<div class="q">'+title+'</div>'+fields.map(function(f,k){return '<p style="margin:6px 0">'+f.label+'</p><input id="af'+k+'" value="'+esc(f.value||"")+'">';}).join("")+'<br><button class="btn" id="aok">✔ Opslaan</button><button class="btn" id="ano">Annuleren</button>');
+ var go=function(){var vals=fields.map(function(f,k){return $("af"+k).value.trim();});if(vals.some(function(v){return !v;}))return;ovClose();cb(vals);};
+ $("aok").onclick=go;$("ano").onclick=ovClose;fields.forEach(function(f,k){$("af"+k).onkeydown=function(e){if(e.key==="Enter")go();};});setTimeout(function(){var a=$("af0");if(a)a.focus();},30);}
+// ---------- accent buttons ----------
+var lastInput=null;document.addEventListener("focusin",function(e){if(e.target&&(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"))lastInput=e.target;});
+function accBar(){return '<div class="acc">'+"é è ê à ç ô î ù ë ï".split(" ").map(function(c){return '<button class="ab" data-c="'+c+'">'+c+'</button>';}).join("")+'</div>';}
+function wireAcc(){qa(".ab").forEach(function(b){b.onmousedown=function(e){e.preventDefault();};b.onclick=function(){var el=lastInput;if(!el||!document.body.contains(el))el=qa("input")[0];if(!el)return;var s=el.selectionStart==null?el.value.length:el.selectionStart,e2=el.selectionEnd==null?s:el.selectionEnd;el.value=el.value.slice(0,s)+b.dataset.c+el.value.slice(e2);el.focus();try{el.setSelectionRange(s+1,s+1);}catch(x){}};});}
+// ---------- high scores ----------
+var MODES={quiz:"❓ Quiz",typen:"⌨️ Typen",shoot:"🚀 Schieten",memory:"🃏 Memory",race:"⏱️ Tijdrace",galgje:"🪢 Galgje"};
+function hs(m){return ST.get("hs_"+m,[]);}
+function qualifies(m,s){var l=hs(m);return s>0&&(l.length<5||s>l[l.length-1].s);}
+function endGame(m,score,extra){stopAll();addXP(10);var l=hs(m);var rec=score>0&&(l.length===0||score>l[0].s);var q=qualifies(m,score);if(score>0&&(rec||score>=(l[0]?l[0].s*.8:1)))confetti();if(rec)SFX.win();
+ var h='<h2 style="color:#6c5ce7;text-shadow:none">Klaar!</h2>'+(rec?'<div class="rec">🏆 Nieuw record! 🏆</div>':'')+'<div class="q">Score: '+score+'</div>'+(extra?'<div class="fact">'+extra+'</div>':'');
+ if(pendingLvl){h+='<div class="rec" style="font-size:24px">⬆️ Level '+pendingLvl+': '+lvlInfo(ST.get("xp",0)).title+'!</div>';confetti();pendingLvl=0;}
+ if(q)h+='<p>Jij staat in de top 5! Hoe heet je?</p><input id="nm" maxlength="12" value="'+esc(ST.get("lastname",""))+'"><br><button class="btn c3" style="color:#fff" id="sv">Opslaan</button>';
+ else h+='<button class="btn" id="sv">Verder</button>';
+ ov(h);window.__lastEnd={m:m,score:score};$("sv").onclick=function(){if(q){var n=($("nm").value||"Speler").trim().slice(0,12)||"Speler";ST.set("lastname",n);l.push({n:n,s:score,d:new Date().toLocaleDateString("nl-BE")});l.sort(function(a,b){return b.s-a.s;});ST.set("hs_"+m,l.slice(0,5));}ovClose();showScores(m);};}
+// ---------- header / timers ----------
+function hdr(title,info){return '<div class="bar"><button class="btn" id="home">🏠 Menu</button><span>'+title+'</span><span id="info">'+(info||"")+'</span><button class="btn" id="mute">'+(muted?"🔇":"🔊")+'</button></div>';}
+function wire(){$("home").onclick=home;$("mute").onclick=function(){muted=!muted;ST.set("mute",muted);this.textContent=muted?"🔇":"🔊";};}
+var timers=[],raf=null,keyH=null,keyU=null;
+function setKey(f){if(keyH)removeEventListener("keydown",keyH);keyH=f;if(f)addEventListener("keydown",f);}
+function stopAll(){timers.forEach(clearInterval);timers.forEach(clearTimeout);timers=[];if(raf)cancelAnimationFrame(raf);raf=null;setKey(null);if(keyU){removeEventListener("keyup",keyU);keyU=null;}try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}}
+function guard(fn,min){return function(){var n=activeWords().length;min=min||4;if(n<min){ov('<div class="q">Oeps! 🙈</div><p style="font-size:20px">Je hebt minstens <b>'+min+' woorden</b> nodig om te spelen. Nu heb je er '+n+'.</p><p>Voeg woorden toe of zet een lijst aan bij <b>Mijn woorden</b>.</p><button class="btn" id="gw">📝 Naar Mijn woorden</button><button class="btn" id="gok">OK</button>');$("gw").onclick=function(){ovClose();wordsHome();};$("gok").onclick=ovClose;return false;}stopAll();touchDay();fn.apply(null,arguments);return true;};}
+// ---------- HOME ----------
+function home(){stopAll();ovClose();var aw=activeWords(),known=aw.filter(function(w){return stars(w.id)>=2;}).length,L=lvlInfo(ST.get("xp",0)),sn=streakN(),d=dirSet();
+app.innerHTML='<h1>🇫🇷 Frans Woorden Avontuur 🥐</h1>'+
+'<div class="lvl">Level '+L.lv+' · '+L.title+' · 🔥 '+sn+' dag'+(sn===1?'':'en')+' op rij<div class="lvlbar"><div style="width:'+Math.round(L.cur/L.need*100)+'%"></div></div><small>'+L.cur+' / '+L.need+' XP</small></div>'+
+'<h2>'+aw.length+' woorden om te oefenen · '+known+' ken je al goed ⭐</h2>'+
+'<div style="text-align:center;margin-bottom:12px" class="seg">'+Object.keys(DIRS).map(function(k){return '<button data-d="'+k+'" class="'+(k===d?"on":"")+'">'+DIRS[k]+'</button>';}).join("")+'</div>'+
+'<div class="grid">'+
+'<button class="big c0" id="mw">📝 Mijn woorden<small>Typ of plak je woordenlijst</small></button>'+
+'<button class="big c1" id="m1">📚 Leren<small>Flitskaarten + uitspraak</small></button>'+
+'<button class="big c2" id="m2">❓ Quiz<small>4 keuzes, pak de bonus!</small></button>'+
+'<button class="big c9" id="m3">⌨️ Typen<small>Schrijf het zelf (beste oefening!)</small></button>'+
+'<button class="big c3" id="m4">🚀 Schieten<small>Raak de juiste ufo!</small></button>'+
+'<button class="big c4" id="m5">🃏 Memory<small>Zoek de paren</small></button>'+
+'<button class="big c5" id="m6">⏱️ Tijdrace<small>Zoveel mogelijk in 60 sec</small></button>'+
+'<button class="big c10" id="m7">🪢 Galgje<small>Raad het Franse woord</small></button>'+
+'<button class="big c7" id="m8">⭐ Mijn sterren<small>Welke woorden ken je?</small></button>'+
+'<button class="big c8" id="m9">🏆 Topscores<small>De beste 5 per spel</small></button></div>';
+qa(".seg button").forEach(function(b){b.onclick=function(){ST.set("dir",b.dataset.d);home();};});
+$("mw").onclick=wordsHome;$("m1").onclick=guard(learn);$("m2").onclick=guard(quiz);$("m3").onclick=guard(typen);$("m4").onclick=guard(shooter);$("m5").onclick=guard(memory);$("m6").onclick=guard(race);$("m7").onclick=guard(galgje);$("m8").onclick=progress;$("m9").onclick=function(){showScores();};}
+// ---------- MIJN WOORDEN ----------
+function download(name,text){var b=new Blob([text],{type:"text/plain;charset=utf-8"});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name.replace(/[\\\/:*?"<>|]/g,"_")+".txt";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}
+function importText(text,fname){var m=/^#\s*Lijst:\s*(.+)$/m.exec(text);var name=m?m[1].trim():(fname||"Geïmporteerde lijst").replace(/\.[^.]+$/,"");var pairs=parseText(text);if(!pairs.length)return null;var l=mkList(name,pairs,true);DB.lists.push(l);save();return l;}
+function wordsHome(){stopAll();ovClose();
+app.innerHTML=hdr("📝 Mijn woorden",activeWords().length+" actieve woorden")+'<div class="panel"><p style="font-size:18px">Zet een vinkje bij de lijsten waarmee je wilt spelen. Tik op ✏️ om woorden toe te voegen.</p><div id="lists">'+
+(DB.lists.length?DB.lists.map(function(l){return '<div class="lrow"><label style="font-size:28px"><input type="checkbox" class="act" data-id="'+l.id+'" '+(l.active?"checked":"")+' style="width:28px;height:28px"></label><span class="nm">'+esc(l.name)+' <small>('+l.words.length+' woorden)</small></span><button class="btn sm" data-a="open" data-id="'+l.id+'">✏️ Woorden</button><button class="btn sm" data-a="ren" data-id="'+l.id+'">🏷️ Naam</button><button class="btn sm" data-a="exp" data-id="'+l.id+'">💾 Bewaar</button><button class="btn sm" data-a="del" data-id="'+l.id+'">🗑️</button></div>';}).join(""):'<p>Nog geen lijsten. Maak er een!</p>')+
+'</div><button class="big c3" id="nl" style="margin-top:12px">➕ Nieuwe lijst</button> <button class="big c4" id="imp">📂 Lijst openen (.txt)</button><input type="file" id="fp" accept=".txt,text/plain" style="display:none"></div>';wire();
+qa(".act").forEach(function(c){c.onchange=function(){getList(c.dataset.id).active=c.checked;save();$("info").textContent=activeWords().length+" actieve woorden";};});
+qa("[data-a]").forEach(function(b){b.onclick=function(){var l=getList(b.dataset.id),a=b.dataset.a;
+ if(a==="open")listEdit(l.id);
+ else if(a==="ren")ask("Nieuwe naam",[{label:"Naam van de lijst",value:l.name}],function(v){l.name=v[0];save();wordsHome();});
+ else if(a==="exp")download(l.name,exportText(l));
+ else if(a==="del"){if(confirm("Lijst '"+l.name+"' met "+l.words.length+" woorden wissen?")){DB.lists=DB.lists.filter(function(x){return x!==l;});save();wordsHome();}}};});
+$("nl").onclick=function(){ask("Nieuwe lijst",[{label:"Naam (bv. Les 3 - dieren)",value:""}],function(v){var l=mkList(v[0],[],true);DB.lists.push(l);save();listEdit(l.id);});};
+$("imp").onclick=function(){$("fp").click();};
+$("fp").onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var l=importText(String(rd.result),f.name);if(l){SFX.ok();ov('<div class="q">Gelukt! 🎉</div><p>Lijst <b>'+esc(l.name)+'</b> met '+l.words.length+' woorden is toegevoegd.</p><button class="btn" id="ok">OK</button>');$("ok").onclick=function(){ovClose();wordsHome();};}else{ov('<div class="q">Hmm 🤔</div><p>Ik vond geen woorden in dit bestand. Elke regel moet zo zijn: <b>le chien = de hond</b></p><button class="btn" id="ok">OK</button>');$("ok").onclick=ovClose;}};rd.readAsText(f,"utf-8");};}
+function listEdit(id){stopAll();var l=getList(id);if(!l)return wordsHome();
+app.innerHTML=hdr("✏️ "+esc(l.name),'<span id="cnt"></span>')+'<div class="panel">'+
+'<div class="row2"><input id="fr" placeholder="🇫🇷 Frans (bv. le chien)" autocomplete="off" autocapitalize="off" spellcheck="false"><input id="nlw" placeholder="🇧🇪 Nederlands (bv. de hond)" autocomplete="off" spellcheck="false"><button class="plus" id="add" title="Toevoegen">+</button></div>'+accBar()+'<div class="fact" id="fb">Tip: druk op Enter om snel toe te voegen.</div>'+
+'<details style="margin:12px 0;text-align:left"><summary style="font-size:20px;font-weight:bold;cursor:pointer">📋 Plak een lijst</summary><p>Eén woord per regel, bijvoorbeeld:<br><code>le chien = de hond</code> · <code>le chien;de hond</code> · <code>le chien - de hond</code> · of met een tab (uit Excel)</p><textarea id="bulk" placeholder="le chien = de hond&#10;la maison = het huis"></textarea><button class="btn" id="bulkAdd">➕ Alles toevoegen</button></details>'+
+'<table id="wt"></table><button class="btn" id="back">⬅️ Terug naar lijsten</button></div>';wire();wireAcc();
+function table(){$("cnt").textContent=l.words.length+" woorden";$("wt").innerHTML='<tr><th>🇫🇷 Frans</th><th>🇧🇪 Nederlands</th><th></th></tr>'+l.words.map(function(w,k){return '<tr><td>'+esc(w.fr)+'</td><td>'+esc(w.nl)+'</td><td style="white-space:nowrap"><button class="btn sm" data-e="'+k+'">✏️</button><button class="btn sm" data-x="'+k+'">🗑️</button></td></tr>';}).join("");
+ qa("[data-e]").forEach(function(b){b.onclick=function(){var w=l.words[+b.dataset.e];ask("Woord aanpassen",[{label:"🇫🇷 Frans",value:w.fr},{label:"🇧🇪 Nederlands",value:w.nl}],function(v){w.fr=v[0];w.nl=v[1];save();table();});};});
+ qa("[data-x]").forEach(function(b){b.onclick=function(){var w=l.words[+b.dataset.x];if(confirm("'"+w.fr+" = "+w.nl+"' wissen?")){l.words.splice(+b.dataset.x,1);save();table();}};});}
+function add(){var f=$("fr").value.trim(),n=$("nlw").value.trim();if(!f){$("fr").focus();return;}if(!n){$("nlw").focus();return;}l.words.push({id:uid(),fr:f,nl:n});save();SFX.ok();$("fb").textContent="✔ Toegevoegd: "+f+" = "+n;$("fr").value="";$("nlw").value="";$("fr").focus();table();}
+$("add").onclick=add;$("fr").onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();if($("nlw").value.trim())add();else $("nlw").focus();}};$("nlw").onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();add();}};
+$("bulkAdd").onclick=function(){var lines=$("bulk").value.split("\n").filter(function(s){return s.trim();});var p=parseText($("bulk").value);p.forEach(function(x){l.words.push({id:uid(),fr:x[0],nl:x[1]});});save();table();$("bulk").value="";$("fb").textContent="✔ "+p.length+" woorden toegevoegd"+(lines.length>p.length?" ("+(lines.length-p.length)+" regels niet begrepen)":"");if(p.length)SFX.ok();};
+$("back").onclick=wordsHome;table();setTimeout(function(){if($("fr"))$("fr").focus();},50);}
+// ---------- LEREN ----------
+function learn(){var dk=sh(activeWords()).sort(function(a,b){return stars(a.id)-stars(b.id);}),k=0,d=qdir(),sp=canSpeak();
+function r(){var w=dk[k],fr=d==="fr2nl";var front=fr?w.fr:w.nl,back=fr?w.nl:w.fr;
+app.innerHTML=hdr("📚 Leren",(k+1)+" / "+dk.length)+'<div class="card" id="cd"><div class="inner"><div class="face"><div class="flag">'+(fr?"🇫🇷":"🇧🇪")+'</div><div class="name">'+esc(front)+'</div><div class="fact">Tik om de vertaling te zien 👆</div></div><div class="face back"><div class="flag">'+(fr?"🇧🇪":"🇫🇷")+'</div><div class="name">'+esc(back)+'</div><div class="fact">'+esc(w.fr)+' = '+esc(w.nl)+'</div><div class="stars">'+"★".repeat(stars(w.id))+"☆".repeat(3-stars(w.id))+'</div></div></div></div>'+
+'<div style="text-align:center">'+(sp?'<button class="btn" id="say">🔊 Hoor het</button>':'')+'<button class="btn" id="flip">🔄 Omdraaien</button></div><div style="text-align:center"><button class="btn" id="no">✘ Nog niet</button><button class="btn" id="yes">✔ Ik wist het!</button></div><div style="text-align:center"><button class="btn" id="pv">⬅️ Vorige</button><button class="btn" id="sf">🔀 Schudden</button><button class="btn" id="dr">'+DIRS[d]+'</button><button class="btn" id="nx">Volgende ➡️</button></div>';wire();
+var flip=function(){$("cd").classList.toggle("flip");};$("cd").onclick=flip;$("flip").onclick=flip;if(sp)$("say").onclick=function(){speak(w.fr);};
+var nx=function(){k=(k+1)%dk.length;r();};$("nx").onclick=nx;$("pv").onclick=function(){k=(k-1+dk.length)%dk.length;r();};$("sf").onclick=function(){dk=sh(dk);k=0;r();};$("dr").onclick=function(){d=d==="fr2nl"?"nl2fr":"fr2nl";r();};
+$("yes").onclick=function(){mark(w,true);SFX.ok();nx();};$("no").onclick=function(){mark(w,false);tone(300,.1);nx();};
+setKey(function(e){if(e.key==="ArrowRight")nx();else if(e.key==="ArrowLeft")$("pv").click();else if(e.key===" "){e.preventDefault();flip();}});}r();}
+// ---------- QUIZ ----------
+function quiz(){var n=10,pool=deck(n),k=0,score=0,streak=0,good=0;
+function r(){if(k>=n){endGame("quiz",score,good+" van de "+n+" goed!");return;}
+var w=pool[k],q=makeQ(w);
+app.innerHTML=hdr("❓ Quiz","Vraag "+(k+1)+"/"+n+" · ⭐ "+score+" · 🔥 "+streak)+'<div class="panel"><div class="q">'+esc(q.text)+'</div><div class="opts">'+q.opts.map(function(o,j){return '<button class="opt" data-j="'+j+'">'+esc(o)+'</button>';}).join("")+'</div><div class="fact" id="fb"></div></div>';wire();
+var done=false;function pick(j){if(done)return;done=true;var b=qa(".opt")[j],ok=q.opts[j]===q.answer;mark(w,ok);
+ if(ok){streak++;good++;var pts=10+(streak>=3?5*(streak-2):0);score+=pts;b.classList.add("ok");SFX.ok();$("fb").textContent="Super! +"+pts+(streak>=3?" (reeks-bonus 🔥)":"");if(streak%5===0)confetti();}
+ else{streak=0;b.classList.add("bad");SFX.bad();qa(".opt").forEach(function(x,i){if(q.opts[i]===q.answer)x.classList.add("ok");});$("fb").textContent="Oei! "+w.fr+" = "+w.nl;}
+ timers.push(setTimeout(function(){k++;r();},ok?900:1900));}
+qa(".opt").forEach(function(b,j){b.onclick=function(){pick(j);};});setKey(function(e){var j="1234".indexOf(e.key);if(j>=0&&j<q.opts.length)pick(j);});}r();}
+// ---------- TYPEN ----------
+function typen(){var n=10,pool=deck(n),k=0,score=0,good=0;
+function r(){if(k>=n){endGame("typen",score,good+" van de "+n+" goed geschreven!");return;}
+var w=pool[k],q=makeQ(w),hints=0,done=false;
+app.innerHTML=hdr("⌨️ Typen","Woord "+(k+1)+"/"+n+" · ⭐ "+score)+'<div class="panel"><div class="q">'+esc(q.text)+'</div><div class="hint" id="hn"></div><input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Typ hier je antwoord">'+accBar()+'<div><button class="btn" id="chk">✔ Controleer</button><button class="btn" id="hint">💡 Hint (−3)</button><button class="btn" id="skip">🤷 Weet ik niet</button></div><div class="q" id="fb" style="font-size:22px"></div></div>';wire();wireAcc();
+function showHint(){var a=q.answer,out="",c=0;for(var i=0;i<a.length;i++){var ch=a.charAt(i);if(/[\s'’-]/.test(ch))out+=ch===" "?"  ":ch;else{out+=c<hints?ch:"_";c++;}}$("hn").textContent=out;}
+function finish(c){done=true;var pts=0;if(c.r==="ok"||c.r==="article")pts=Math.max(2,10-3*hints);else if(c.r==="accent")pts=Math.max(1,Math.floor((10-3*hints)/2));score+=pts;
+ mark(w,c.r!=="wrong");if(c.r==="wrong")SFX.bad();else if(c.r==="accent")SFX.mid();else{SFX.ok();good++;}if(c.r==="accent")good++;
+ $("fb").innerHTML=checkMsg(c)+(pts?' <b>+'+pts+'</b>':'')+'<br><button class="btn" id="nx">Volgende ➡️</button>';$("ans").disabled=true;$("chk").disabled=true;$("hint").disabled=true;$("skip").disabled=true;$("nx").onclick=function(){k++;r();};$("nx").focus();}
+$("chk").onclick=function(){if(done)return;var v=$("ans").value;if(!v.trim()){$("ans").focus();return;}finish(check(v,q.answer));};
+$("hint").onclick=function(){if(done)return;var letters=q.answer.replace(/[\s'’-]/g,"").length;if(hints<letters){hints++;showHint();}$("ans").focus();};
+$("skip").onclick=function(){if(!done)finish({r:"wrong",full:q.answer});};
+$("ans").onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();$("chk").click();}};
+setKey(function(e){if(e.key==="Enter"&&done&&$("nx")&&document.activeElement!==$("nx")){e.preventDefault();$("nx").click();}});
+$("ans").focus();}r();}
+// ---------- SCHIETEN ----------
+function shooter(){app.innerHTML=hdr("🚀 Schieten",'')+'<div class="panel" style="padding:8px;background:#222"><canvas id="cv"></canvas></div><p style="color:#fff;text-align:center">Beweeg met muis of vinger · klik/tik of SPATIE om te schieten · pijltjes werken ook</p>';wire();
+var cv=$("cv"),g=cv.getContext("2d"),W=800,H=560;cv.width=W;cv.height=H;
+var ship={x:W/2},bullets=[],targets=[],booms=[],st2=[],lives=3,score=0,level=1,hits=0,q=null,over=false,last=0,cool=0,keys={},msg="",msgT=0;
+for(var i=0;i<60;i++)st2.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*2+.5});
+function fs(t){g.font="bold 19px Trebuchet MS";var wd=g.measureText(t).width;return wd>150?Math.max(12,Math.floor(19*150/wd)):19;}
+function round(){q=makeQ(pickW(activeWords()));var cnt=Math.min(3+Math.floor(level/2),4);var labels=[q.answer].concat(q.opts.filter(function(o){return o!==q.answer;})).slice(0,cnt);labels=sh(labels);targets=[];var slot=W/labels.length;
+ labels.forEach(function(l,j){targets.push({x:slot*j+slot/2,y:-40-Math.random()*120,t:l,ok:l===q.answer,vx:(Math.random()-.5)*30,ph:Math.random()*6,hue:Math.floor(Math.random()*360),f:fs(l)});});}
+function pos(e){var r=cv.getBoundingClientRect();var p=e.touches?e.touches[0]:e;return (p.clientX-r.left)*W/r.width;}
+cv.addEventListener("mousemove",function(e){ship.x=pos(e);});
+cv.addEventListener("touchmove",function(e){e.preventDefault();ship.x=pos(e);},{passive:false});
+cv.addEventListener("touchstart",function(e){e.preventDefault();ship.x=pos(e);fire();},{passive:false});
+cv.addEventListener("mousedown",function(e){ship.x=pos(e);fire();});
+setKey(function(e){if(e.code==="Space"){e.preventDefault();fire();}keys[e.key]=1;});
+keyU=function(e){keys[e.key]=0;};addEventListener("keyup",keyU);
+function fire(){if(over||cool>0)return;cool=.18;bullets.push({x:ship.x,y:H-60});SFX.shot();}
+function sol(){return q.w.fr+" = "+q.w.nl;}
+function lose(text){lives--;SFX.bad();msg=text;msgT=2;if(q)mark(q.w,false);if(lives<=0){over=true;timers.push(setTimeout(function(){endGame("shoot",score,"Level "+level+" bereikt, "+hits+" keer raak!");},900));}else round();}
+function boom(x,y,col){for(var i=0;i<30;i++){var a=Math.random()*6.28,s=60+Math.random()*200;booms.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:.8,c:col});}}
+round();window.__shoot={get t(){return targets;},hit:function(ok){var tg=targets.filter(function(t){return t.ok===ok;})[0];if(tg){tg.y=Math.max(tg.y,120);bullets.push({x:tg.x,y:tg.y+25});}},state:function(){return {lives:lives,score:score,over:over};},step:function(ts){loop(ts);}};
+function loop(ts){var dt=Math.max(0,Math.min((ts-(last||ts))/1000,.05));last=ts;cool-=dt;
+ if(keys.ArrowLeft)ship.x-=500*dt;if(keys.ArrowRight)ship.x+=500*dt;ship.x=Math.max(30,Math.min(W-30,ship.x));
+ var sp=30+level*10;
+ if(!over){bullets.forEach(function(b){b.y-=700*dt;});bullets=bullets.filter(function(b){return b.y>-10;});
+ for(var t=0;t<targets.length;t++){var o=targets[t];o.y+=sp*dt;o.ph+=dt*2;o.x+=Math.sin(o.ph)*20*dt+o.vx*dt;o.x=Math.max(85,Math.min(W-85,o.x));}
+ outer:for(var bi=bullets.length-1;bi>=0;bi--){for(var ti=0;ti<targets.length;ti++){var tg=targets[ti],b=bullets[bi];if(Math.abs(b.x-tg.x)<82&&Math.abs(b.y-tg.y)<30){bullets.splice(bi,1);
+  if(tg.ok){score+=10*level;hits++;mark(q.w,true);SFX.boom();SFX.ok();boom(tg.x,tg.y,"#ffd32a");msg="Raak! "+sol();msgT=1.6;if(hits%4===0)level++;round();}
+  else{boom(tg.x,tg.y,"#ff4757");lose("Fout! "+sol());}break outer;}}}
+ if(!over)for(var m=0;m<targets.length;m++)if(targets[m].ok&&targets[m].y>H-70){lose("Gemist! "+sol());break;}}
+ booms.forEach(function(p){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;});booms=booms.filter(function(p){return p.l>0;});msgT-=dt;
+ g.fillStyle="#0b1026";g.fillRect(0,0,W,H);g.fillStyle="#fff";st2.forEach(function(s){s.y+=s.s*20*dt;if(s.y>H)s.y=0;g.fillRect(s.x,s.y,s.s,s.s);});
+ targets.forEach(function(o){g.fillStyle="hsl("+o.hue+",80%,55%)";g.beginPath();g.ellipse(o.x,o.y,82,26,0,0,6.28);g.fill();g.fillStyle="rgba(180,240,255,.8)";g.beginPath();g.ellipse(o.x,o.y-17,28,16,0,3.14,6.28);g.fill();g.fillStyle="#fff";g.font="bold "+o.f+"px Trebuchet MS";g.textAlign="center";g.textBaseline="middle";g.fillText(o.t,o.x,o.y+3);});
+ g.fillStyle="#ffd32a";bullets.forEach(function(b){g.beginPath();g.arc(b.x,b.y,5,0,6.28);g.fill();});
+ booms.forEach(function(p){g.globalAlpha=Math.max(p.l,0);g.fillStyle=p.c;g.fillRect(p.x,p.y,5,5);});g.globalAlpha=1;
+ g.font="40px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText("🚀",ship.x,H-30);
+ g.fillStyle="rgba(0,0,0,.6)";g.fillRect(0,0,W,46);g.fillStyle="#fff";g.font="bold 24px Trebuchet MS";g.fillText(q?q.short:"",W/2,24);
+ g.textAlign="left";g.font="bold 20px Trebuchet MS";g.fillText("❤️".repeat(Math.max(lives,0))+"  Score: "+score+"  Level: "+level,10,72);
+ if(msgT>0){g.textAlign="center";g.fillStyle="#ffd32a";g.font="bold 24px Trebuchet MS";g.fillText(msg,W/2,H/2);}
+ if(over){g.textAlign="center";g.fillStyle="#ff6b6b";g.font="bold 50px Trebuchet MS";g.fillText("GAME OVER",W/2,H/2-50);}
+ raf=requestAnimationFrame(loop);}
+raf=requestAnimationFrame(loop);}
+// ---------- MEMORY ----------
+function memory(){var seenF=[],seenN=[],pick=[];sh(activeWords()).forEach(function(w){if(pick.length<8&&seenF.indexOf(norm(w.fr))<0&&seenN.indexOf(norm(w.nl))<0){seenF.push(norm(w.fr));seenN.push(norm(w.nl));pick.push(w);}});
+var P=pick.length,cards=[];pick.forEach(function(w){cards.push({w:w,t:"🇫🇷 "+w.fr});cards.push({w:w,t:"🇧🇪 "+w.nl});});cards=sh(cards);
+var open=[],moves=0,found=0,t0=Date.now(),lock=false;
+app.innerHTML=hdr("🃏 Memory",'')+'<div class="panel"><div class="mem" id="mg">'+cards.map(function(c,j){return '<div class="mc" data-j="'+j+'">❓</div>';}).join("")+'</div></div>';wire();
+function info(){var e=$("info");if(e)e.textContent="Zetten: "+moves+" · ⏱️ "+Math.floor((Date.now()-t0)/1000)+"s";}info();timers.push(setInterval(info,500));
+qa(".mc").forEach(function(el){el.onclick=function(){var j=+el.dataset.j;if(lock||el.classList.contains("open")||el.classList.contains("done"))return;el.classList.add("open");el.textContent=cards[j].t;tone(500,.06);open.push(el);
+ if(open.length===2){moves++;var a=cards[+open[0].dataset.j],b=cards[+open[1].dataset.j];if(a.w===b.w){SFX.ok();mark(a.w,true);open.forEach(function(x){x.classList.add("done");});open=[];found++;
+  if(found===P){var s=Math.floor((Date.now()-t0)/1000);var score=Math.max(10,Math.round((1000-moves*20-s*5)*P/8));timers.push(setTimeout(function(){endGame("memory",score,moves+" zetten in "+s+" seconden");},600));}}
+ else{lock=true;var pr=open;open=[];timers.push(setTimeout(function(){pr.forEach(function(x){x.classList.remove("open");x.textContent="❓";});lock=false;},900));}}info();};});}
+// ---------- TIJDRACE ----------
+function race(){var left=60,score=0,streak=0,cur=null;
+app.innerHTML=hdr("⏱️ Tijdrace",'')+'<div class="panel" id="rp"></div>';wire();
+function info(){var e=$("info");if(e)e.textContent="⏱️ "+left+"s · ⭐ "+score;}info();
+timers.push(setInterval(function(){left--;info();if(left<=0){endGame("race",score,"in 60 seconden!");}},1000));
+function next(){var p=$("rp");if(!p)return;cur=makeQ(pickW(activeWords()));p.innerHTML='<div class="q">'+esc(cur.text)+'</div><div class="opts">'+cur.opts.map(function(o,j){return '<button class="opt" data-j="'+j+'">'+esc(o)+'</button>';}).join("")+'</div>';
+ qa(".opt",p).forEach(function(b,j){b.onclick=function(){ans(j);};});}
+function ans(j){if(left<=0||!cur)return;var ok=cur.opts[j]===cur.answer;mark(cur.w,ok);if(ok){streak++;score+=1+(streak>=5?1:0);SFX.ok();}else{streak=0;SFX.bad();var p=$("rp");p.classList.remove("shake");void p.offsetWidth;p.classList.add("shake");}info();next();}
+setKey(function(e){var j="1234".indexOf(e.key);if(j>=0&&cur&&j<cur.opts.length)ans(j);});
+window.__race={ans:function(ok){var j=cur.opts.indexOf(cur.answer);if(!ok)j=(j+1)%cur.opts.length;ans(j);},end:function(){left=1;}};
+next();}
+// ---------- GALGJE ----------
+var HANG=['<line x1="10" y1="140" x2="110" y2="140"/>','<line x1="30" y1="140" x2="30" y2="10"/>','<line x1="30" y1="10" x2="90" y2="10"/><line x1="90" y1="10" x2="90" y2="30"/>','<circle cx="90" cy="42" r="12"/>','<line x1="90" y1="54" x2="90" y2="95"/>','<line x1="90" y1="65" x2="72" y2="82"/><line x1="90" y1="65" x2="108" y2="82"/>','<line x1="90" y1="95" x2="75" y2="120"/><line x1="90" y1="95" x2="105" y2="120"/>'];
+function galgje(){var n=5,pool=deck(n),k=0,score=0,solved=0;
+function r(){if(k>=n){endGame("galgje",score,solved+" van de "+n+" woorden geraden!");return;}
+var w=pool[k],word=w.fr,guessed=[],wrong=0,done=false,MAX=HANG.length;
+function base(ch){return noAcc(ch.toLowerCase());}
+function isL(ch){return /[a-z]/.test(base(ch));}
+function shown(){return word.split("").map(function(ch){return !isL(ch)||guessed.indexOf(base(ch))>=0||done?ch:"_";}).join(" ");}
+function draw(){app.innerHTML=hdr("🪢 Galgje","Woord "+(k+1)+"/"+n+" · ⭐ "+score)+'<div class="panel"><div class="fact" style="font-size:22px">🇧🇪 Hint: <b>'+esc(w.nl)+'</b></div><svg viewBox="0 0 120 150" width="150" height="180" stroke="#6c5ce7" stroke-width="5" fill="none" stroke-linecap="round">'+HANG.slice(0,wrong).join("")+'</svg><div class="word">'+esc(shown())+'</div><div class="fact">Nog '+(MAX-wrong)+' fouten over</div><div class="kb">'+"abcdefghijklmnopqrstuvwxyz".split("").map(function(c){return '<button data-c="'+c+'" '+(guessed.indexOf(c)>=0||done?"disabled":"")+'>'+c+'</button>';}).join("")+'</div><div id="fb" class="q"></div></div>';wire();
+ qa(".kb button").forEach(function(b){b.onclick=function(){guess(b.dataset.c);};});}
+function guess(c){if(done||guessed.indexOf(c)>=0)return;guessed.push(c);var hit=word.split("").some(function(ch){return base(ch)===c;});if(hit)tone(700,.08,"square");else{wrong++;SFX.bad();}
+ var won=word.split("").every(function(ch){return !isL(ch)||guessed.indexOf(base(ch))>=0;});
+ if(won||wrong>=MAX){done=true;mark(w,won);if(won){solved++;var pts=10+(MAX-wrong)*2;score+=pts;SFX.ok();}draw();$("fb").innerHTML=(won?'<span class="fbok">Bravo! +'+pts+'</span>':'<span class="fbbad">Helaas!</span>')+' '+esc(w.fr)+' = '+esc(w.nl)+'<br><button class="btn" id="nx">Volgende ➡️</button>';$("nx").onclick=function(){k++;r();};if(canSpeak())speak(w.fr);}else draw();}
+setKey(function(e){if(done&&e.key==="Enter"){$("nx").click();return;}var c=e.key&&e.key.length===1?base(e.key):"";if(/^[a-z]$/.test(c))guess(c);});
+window.__galg={word:word,guess:guess};draw();}r();}
+// ---------- STERREN ----------
+function progress(){stopAll();var aw=activeWords();app.innerHTML=hdr("⭐ Mijn sterren")+'<div class="panel"><p>Elk goed antwoord brengt je dichter bij 3 sterren! Woorden met weinig sterren komen vaker terug in de spelletjes.</p>'+(aw.length?'<table><tr><th>🇫🇷 Frans</th><th>🇧🇪 Nederlands</th><th>Sterren</th><th>✔/✘</th></tr>'+
+aw.slice().sort(function(a,b){return stars(a.id)-stars(b.id);}).map(function(w){var r=prog(w.id),s=stars(w.id);return '<tr><td>'+esc(w.fr)+'</td><td>'+esc(w.nl)+'</td><td class="stars">'+"★".repeat(s)+"☆".repeat(3-s)+'</td><td>'+r.g+"/"+r.f+'</td></tr>';}).join("")+'</table>':'<p>Geen actieve woorden.</p>')+'<button class="btn" id="rs">Sterren wissen</button></div>';wire();
+$("rs").onclick=function(){if(confirm("Weet je zeker dat je alle sterren wilt wissen?")){ST.set("prog",{});progress();}};}
+function showScores(hl){stopAll();app.innerHTML=hdr("🏆 Topscores")+'<div class="grid">'+Object.keys(MODES).map(function(m){var l=hs(m);return '<div class="panel" style="'+(m===hl?"outline:5px solid #f9a825":"")+'"><b style="font-size:22px">'+MODES[m]+'</b><table>'+(l.length?l.map(function(e,k){return '<tr><td>'+["🥇","🥈","🥉","4.","5."][k]+'</td><td>'+esc(e.n)+'</td><td><b>'+e.s+'</b></td></tr>';}).join(""):'<tr><td>Nog geen scores</td></tr>')+'</table></div>';}).join("")+'</div>';wire();}
+window.__T={DB:function(){return DB;},save:save,parseLine:parseLine,parseText:parseText,check:check,activeWords:activeWords,importText:importText,exportText:exportText,stars:stars,lvlInfo:lvlInfo,home:home,wordsHome:wordsHome,listEdit:listEdit,guard:guard,learn:learn,quiz:quiz,typen:typen,shooter:shooter,memory:memory,race:race,galgje:galgje,progress:progress,showScores:showScores,streakN:streakN};
+home();
+</script></body></html>

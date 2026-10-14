@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="nl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>EU Hoofdsteden Avontuur</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:"Comic Sans MS","Trebuchet MS",Arial,sans-serif;background:linear-gradient(160deg,#4facfe,#8e44ad);min-height:100vh;color:#222;user-select:none}
+#app{max-width:1000px;margin:0 auto;padding:12px}
+h1{color:#fff;text-align:center;font-size:clamp(28px,5vw,48px);text-shadow:3px 3px 0 #ff6b6b;margin:10px 0}
+h2{text-align:center;color:#fff;text-shadow:2px 2px 0 #333;font-size:clamp(22px,4vw,34px);margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.big{border:none;border-radius:22px;padding:22px 10px;font-size:24px;font-weight:bold;color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.25);font-family:inherit;transition:transform .1s}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.big small{display:block;font-size:15px;font-weight:normal;margin-top:6px}
+.c1{background:#ff6b6b}.c2{background:#f9a825}.c3{background:#2ecc71}.c4{background:#00b3d6}.c5{background:#e84393}.c6{background:#6c5ce7}.c7{background:#fd7e14}.c8{background:#16a085}
+.btn{border:none;border-radius:14px;padding:12px 18px;font-size:20px;font-weight:bold;cursor:pointer;background:#fff;color:#6c5ce7;margin:5px;font-family:inherit;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.btn:active{transform:translateY(3px)}
+.bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;color:#fff;font-size:20px;font-weight:bold;margin-bottom:8px}
+.panel{background:#fff;border-radius:22px;padding:18px;box-shadow:0 8px 20px rgba(0,0,0,.2);text-align:center}
+.card{perspective:1000px;width:min(420px,92vw);height:300px;margin:10px auto;cursor:pointer}
+.inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.card.flip .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.back{transform:rotateY(180deg);background:#fff8dc}
+.flag{font-size:80px;line-height:1}
+.name{font-size:36px;font-weight:bold;color:#6c5ce7}
+.fact{font-size:18px;color:#444;margin-top:10px}
+.q{font-size:clamp(22px,4vw,32px);font-weight:bold;margin:10px 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font-size:clamp(18px,3.5vw,26px);padding:18px 8px;border-radius:16px;border:none;background:#74b9ff;color:#fff;font-weight:bold;cursor:pointer;font-family:inherit;box-shadow:0 5px 0 #0984e3}
+.opt.ok{background:#2ecc71;box-shadow:0 5px 0 #1e8449}.opt.bad{background:#e74c3c;box-shadow:0 5px 0 #922b21}
+canvas{display:block;width:100%;border-radius:18px;background:#0b1026;touch-action:none}
+.mem{display:grid;gap:8px;grid-template-columns:repeat(4,1fr)}
+.mc{min-height:80px;border-radius:14px;background:#6c5ce7;color:#fff;font-weight:bold;font-size:clamp(14px,2.6vw,20px);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:4px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.mc.open{background:#fff;color:#333}.mc.done{background:#2ecc71;color:#fff;opacity:.75}
+table{width:100%;border-collapse:collapse;font-size:18px}td,th{padding:6px;border-bottom:1px solid #eee}
+.stars{color:#f9a825;font-size:22px;letter-spacing:2px}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10}
+#overlay .panel{max-width:440px;width:92%}
+input{font-size:22px;padding:10px;border-radius:12px;border:3px solid #6c5ce7;width:80%;font-family:inherit;text-align:center}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+.rec{font-size:34px;color:#e84393;font-weight:bold;animation:pop .6s infinite alternate}
+@keyframes pop{from{transform:scale(1)}to{transform:scale(1.15)}}
+.shake{animation:sh .3s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#confetti{background:transparent;border-radius:0;width:100%;height:100%}
+</style></head><body>
+<canvas id="confetti"></canvas>
+<div id="app"></div>
+<div id="overlay"><div class="panel" id="ovp"></div></div>
+<script>
+"use strict";
+var EU=[
+["België","Brussel","🇧🇪","België heeft drie officiële talen: Nederlands, Frans en Duits!"],
+["Bulgarije","Sofia","🇧🇬","In Bulgarije betekent knikken 'nee' en schudden 'ja'!"],
+["Cyprus","Nicosia","🇨🇾","Op de vlag van Cyprus staat een kaart van het eiland zelf."],
+["Denemarken","Kopenhagen","🇩🇰","LEGO werd uitgevonden in Denemarken!"],
+["Duitsland","Berlijn","🇩🇪","Duitsland heeft meer dan 1500 soorten worst."],
+["Estland","Tallinn","🇪🇪","Estland is een van de meest digitale landen: je kunt er online stemmen."],
+["Finland","Helsinki","🇫🇮","Finland heeft meer dan 180 000 meren en heel veel sauna's!"],
+["Frankrijk","Parijs","🇫🇷","De Eiffeltoren groeit in de zomer een paar centimeter door de warmte."],
+["Griekenland","Athene","🇬🇷","De Olympische Spelen zijn lang geleden in Griekenland begonnen."],
+["Hongarije","Boedapest","🇭🇺","De Rubiks kubus werd uitgevonden in Hongarije."],
+["Ierland","Dublin","🇮🇪","Halloween komt oorspronkelijk uit Ierland!"],
+["Italië","Rome","🇮🇹","Pizza komt uit Italië, en midden in Rome ligt een heel klein landje: Vaticaanstad."],
+["Kroatië","Zagreb","🇭🇷","De stropdas werd bedacht in Kroatië."],
+["Letland","Riga","🇱🇻","In Riga zou de eerste versierde kerstboom gestaan hebben."],
+["Litouwen","Vilnius","🇱🇹","Basketbal is in Litouwen bijna een tweede religie!"],
+["Luxemburg","Luxemburg","🇱🇺","In Luxemburg zijn bus, tram en trein gratis voor iedereen."],
+["Malta","Valletta","🇲🇹","Malta is het kleinste land van de EU."],
+["Nederland","Amsterdam","🇳🇱","Er zijn meer fietsen dan mensen in Nederland!"],
+["Oostenrijk","Wenen","🇦🇹","Mozart, de beroemde componist, werd geboren in Oostenrijk."],
+["Polen","Warschau","🇵🇱","In Polen ligt een zoutmijn met een kerk helemaal uit zout."],
+["Portugal","Lissabon","🇵🇹","Portugal maakt de helft van alle kurk in de wereld."],
+["Roemenië","Boekarest","🇷🇴","In Roemenië staat het kasteel van Dracula!"],
+["Slovenië","Ljubljana","🇸🇮","Slovenië is voor meer dan de helft bedekt met bossen, met echte beren!"],
+["Slowakije","Bratislava","🇸🇰","Slowakije heeft heel veel kastelen, meer dan 100!"],
+["Spanje","Madrid","🇪🇸","In Spanje gooien mensen tijdens 'La Tomatina' met tomaten naar elkaar."],
+["Tsjechië","Praag","🇨🇿","In Praag staat een van de oudste werkende astronomische klokken ter wereld."],
+["Zweden","Stockholm","🇸🇪","In Zweden staat een hotel helemaal gemaakt van ijs!"]
+];
+var C=EU.map(function(e,i){return {i:i,land:e[0],stad:e[1],vlag:e[2],feit:e[3]};});
+var $=function(id){return document.getElementById(id)};
+var app=$("app");
+function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+// storage
+var ST={get:function(k,d){try{var v=localStorage.getItem("euhs_"+k);return v?JSON.parse(v):d;}catch(e){return d;}},set:function(k,v){try{localStorage.setItem("euhs_"+k,JSON.stringify(v));}catch(e){}}};
+function mark(i,ok){var p=ST.get("prog",{});var r=p[i]||{g:0,f:0};if(ok)r.g++;else r.f++;p[i]=r;ST.set("prog",p);}
+function stars(i){var r=ST.get("prog",{})[i];if(!r)return 0;var s=r.g-r.f;return s>=8?3:s>=4?2:r.g>=1&&s>=1?1:0;}
+// sound
+var muted=ST.get("mute",false),actx=null;
+function tone(f,d,type,delay){if(muted)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();var t=actx.currentTime+(delay||0);var o=actx.createOscillator(),g=actx.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d);}catch(e){}}
+var SFX={ok:function(){tone(660,.12,"square");tone(880,.2,"square",.1);},bad:function(){tone(200,.3,"sawtooth");},shot:function(){tone(900,.08,"triangle");},boom:function(){tone(120,.35,"sawtooth");tone(80,.4,"square",.05);},win:function(){[523,659,784,1046].forEach(function(f,k){tone(f,.25,"square",k*.12);});}};
+// confetti
+var cf=$("confetti"),cx=cf.getContext("2d"),parts=[],cfRun=false;
+function confetti(){cf.width=innerWidth;cf.height=innerHeight;for(var i=0;i<160;i++)parts.push({x:Math.random()*cf.width,y:-20-Math.random()*cf.height*.5,vx:(Math.random()-.5)*4,vy:2+Math.random()*4,c:"hsl("+(Math.random()*360)+",90%,60%)",s:6+Math.random()*8,r:Math.random()*6});if(!cfRun){cfRun=true;requestAnimationFrame(cfl);}}
+function cfl(){cx.clearRect(0,0,cf.width,cf.height);parts=parts.filter(function(p){p.x+=p.vx;p.y+=p.vy;p.r+=.1;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore();return p.y<cf.height+20;});if(parts.length)requestAnimationFrame(cfl);else{cfRun=false;cx.clearRect(0,0,cf.width,cf.height);}}
+// overlay
+function ov(html){$("ovp").innerHTML=html;$("overlay").style.display="flex";}
+function ovClose(){$("overlay").style.display="none";}
+// highscores
+var MODES={quiz10:"Quiz (10 vragen)",quiz27:"Quiz (27 vragen)",shoot:"Schieten",memory:"Memory",race:"Tijdrace",wnw:"Waar of niet waar"};
+function hs(m){return ST.get("hs_"+m,[]);}
+function qualifies(m,s){var l=hs(m);return s>0&&(l.length<5||s>l[l.length-1].s);}
+function endGame(m,score,extra){stopAll();var l=hs(m);var rec=score>0&&(l.length===0||score>l[0].s);var q=qualifies(m,score);if(score>0&&(rec||score>=(l[0]?l[0].s*.8:1)))confetti();if(rec)SFX.win();
+ var h='<h2 style="color:#6c5ce7;text-shadow:none">Klaar!</h2>'+(rec?'<div class="rec">🏆 Nieuw record! 🏆</div>':'')+'<div class="q">Score: '+score+'</div>'+(extra?'<div class="fact">'+extra+'</div>':'');
+ if(q)h+='<p>Jij staat in de top 5! Hoe heet je?</p><input id="nm" maxlength="12" value="'+esc(ST.get("lastname",""))+'"><br><button class="btn c3" style="color:#fff" id="sv">Opslaan</button>';
+ else h+='<button class="btn" id="sv">Verder</button>';
+ ov(h);$("sv").onclick=function(){if(q){var n=($("nm").value||"Speler").trim().slice(0,12)||"Speler";ST.set("lastname",n);l.push({n:n,s:score,d:new Date().toLocaleDateString("nl-BE")});l.sort(function(a,b){return b.s-a.s;});ST.set("hs_"+m,l.slice(0,5));}ovClose();showScores(m);};}
+// header
+function hdr(title,info){return '<div class="bar"><button class="btn" id="home">🏠 Menu</button><span>'+title+'</span><span id="info">'+(info||"")+'</span><button class="btn" id="mute">'+(muted?"🔇":"🔊")+'</button></div>';}
+function wire(){$("home").onclick=home;$("mute").onclick=function(){muted=!muted;ST.set("mute",muted);this.textContent=muted?"🔇":"🔊";};}
+var timers=[],raf=null,keyH=null;
+function stopAll(){timers.forEach(clearInterval);timers.forEach(clearTimeout);timers=[];if(raf)cancelAnimationFrame(raf);raf=null;if(keyH){removeEventListener("keydown",keyH);keyH=null;}}
+// HOME
+function home(){stopAll();ovClose();var known=C.filter(function(c){return stars(c.i)>=2;}).length;
+app.innerHTML='<h1>🌍 EU Hoofdsteden Avontuur 🚀</h1><h2>Je kent er al '+known+' van de 27 goed! ⭐</h2><div class="grid">'+
+'<button class="big c1" id="m1">📚 Leren<small>Flitskaarten om te oefenen</small></button>'+
+'<button class="big c2" id="m2">❓ Quiz<small>4 keuzes, pak de bonus!</small></button>'+
+'<button class="big c3" id="m3">🚀 Schieten<small>Raak het juiste doel!</small></button>'+
+'<button class="big c4" id="m4">🃏 Memory<small>Zoek de paren</small></button>'+
+'<button class="big c5" id="m5">⏱️ Tijdrace<small>Zoveel mogelijk in 60 sec</small></button>'+
+'<button class="big c6" id="m6">✅ Waar of niet waar<small>Snel beslissen!</small></button>'+
+'<button class="big c7" id="m7">⭐ Mijn sterren<small>Welke landen ken je?</small></button>'+
+'<button class="big c8" id="m8">🏆 Topscores<small>De beste 5 per spel</small></button></div>';
+$("m1").onclick=learn;$("m2").onclick=quizMenu;$("m3").onclick=shooter;$("m4").onclick=memory;$("m5").onclick=function(){race("race");};$("m6").onclick=function(){race("wnw");};$("m7").onclick=progress;$("m8").onclick=function(){showScores();};}
+// LEARN
+function learn(){var deck=C.slice(),k=0;function r(){var c=deck[k];app.innerHTML=hdr("📚 Leren",(k+1)+" / "+deck.length)+'<div class="card" id="cd"><div class="inner"><div class="face"><div class="flag">'+c.vlag+'</div><div class="name">'+c.land+'</div><div class="fact">Tik om de hoofdstad te zien 👆</div></div><div class="face back"><div class="flag">'+c.vlag+'</div><div class="fact">De hoofdstad van '+c.land+' is</div><div class="name">'+c.stad+'</div><div class="fact">💡 '+c.feit+'</div></div></div></div><div style="text-align:center"><button class="btn" id="pv">⬅️ Vorige</button><button class="btn" id="sf">🔀 Schudden</button><button class="btn" id="nx">Volgende ➡️</button></div>';wire();
+$("cd").onclick=function(){this.classList.toggle("flip");};$("pv").onclick=function(){k=(k-1+deck.length)%deck.length;r();};$("nx").onclick=function(){k=(k+1)%deck.length;r();};$("sf").onclick=function(){deck=sh(deck);k=0;r();};}r();}
+// question generator
+function makeQ(dir){var c=C[Math.floor(Math.random()*27)];if(dir==null)dir=Math.random()<.5?0:1;var wrong=sh(C.filter(function(x){return x.i!==c.i;})).slice(0,3);var f=dir===0?function(x){return x.stad;}:function(x){return x.land;};
+return {c:c,dir:dir,text:dir===0?"Wat is de hoofdstad van "+c.vlag+" "+c.land+"?":"Van welk land is "+c.stad+" de hoofdstad?",short:dir===0?"Raak de hoofdstad van "+c.land+"!":"Raak het land met hoofdstad "+c.stad+"!",answer:f(c),opts:sh([c].concat(wrong)).map(f)};}
+// QUIZ
+function quizMenu(){stopAll();app.innerHTML=hdr("❓ Quiz")+'<div class="panel"><div class="q">Hoeveel vragen?</div><button class="big c2" id="q10">10 vragen</button> <button class="big c1" id="q27">27 vragen</button></div>';wire();$("q10").onclick=function(){quiz(10);};$("q27").onclick=function(){quiz(27);};}
+function quiz(n){var pool=sh(C).slice(0,n),k=0,score=0,streak=0,good=0;function r(){if(k>=n){endGame("quiz"+n,score,good+" van de "+n+" goed!");if(good/n>=.7)confetti();return;}
+var c=pool[k],q=makeQ();q.c=c;var dir=q.dir,f=dir===0?function(x){return x.stad;}:function(x){return x.land;};q.answer=f(c);q.opts=sh([c].concat(sh(C.filter(function(x){return x.i!==c.i;})).slice(0,3))).map(f);q.text=dir===0?"Wat is de hoofdstad van "+c.vlag+" "+c.land+"?":"Van welk land is "+c.stad+" de hoofdstad?";
+app.innerHTML=hdr("❓ Quiz","Vraag "+(k+1)+"/"+n+" · ⭐ "+score+" · 🔥 "+streak)+'<div class="panel"><div class="q">'+esc(q.text)+'</div><div class="opts">'+q.opts.map(function(o,j){return '<button class="opt" data-j="'+j+'">'+esc(o)+'</button>';}).join("")+'</div><div class="fact" id="fb"></div></div>';wire();
+var done=false;Array.prototype.forEach.call(document.querySelectorAll(".opt"),function(b){b.onclick=function(){if(done)return;done=true;var ok=q.opts[+b.dataset.j]===q.answer;mark(c.i,ok);
+ if(ok){streak++;good++;var pts=10+(streak>=3?5*(streak-2):0);score+=pts;b.classList.add("ok");SFX.ok();$("fb").textContent="Super! +"+pts+(streak>=3?" (reeks-bonus 🔥)":"");}
+ else{streak=0;b.classList.add("bad");SFX.bad();Array.prototype.forEach.call(document.querySelectorAll(".opt"),function(x){if(q.opts[+x.dataset.j]===q.answer)x.classList.add("ok");});$("fb").textContent="Oei! Het juiste antwoord is "+q.answer+".";}
+ timers.push(setTimeout(function(){k++;r();},ok?900:1800));};});}r();}
+// SHOOTER
+function shooter(){stopAll();app.innerHTML=hdr("🚀 Schieten",'')+'<div class="panel" style="padding:8px;background:#222"><canvas id="cv"></canvas></div><p style="color:#fff;text-align:center">Beweeg met muis of vinger · klik/tik of SPATIE om te schieten · pijltjes werken ook</p>';wire();
+var cv=$("cv"),g=cv.getContext("2d"),W=800,H=560;cv.width=W;cv.height=H;
+var ship={x:W/2},bullets=[],targets=[],booms=[],stars2=[],lives=3,score=0,level=1,hits=0,q=null,over=false,last=0,cool=0,keys={},msg="",msgT=0;
+for(var i=0;i<60;i++)stars2.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*2+.5});
+function round(){q=makeQ();var dir=q.dir;var cnt=Math.min(3+Math.floor(level/2),5);var labels=sh([q.answer].concat(q.opts.filter(function(o){return o!==q.answer;})).slice(0,cnt).concat(cnt>4?[dir===0?sh(C)[0].stad:sh(C)[0].land]:[])).filter(function(v,ix,a){return a.indexOf(v)===ix;});
+ if(labels.indexOf(q.answer)<0)labels[0]=q.answer;targets=[];var slot=W/labels.length;labels.forEach(function(l,j){targets.push({x:slot*j+slot/2,y:-40-Math.random()*120,t:l,ok:l===q.answer,vx:(Math.random()-.5)*30,ph:Math.random()*6,hue:Math.floor(Math.random()*360)});});}
+function pos(e){var r=cv.getBoundingClientRect();var p=e.touches?e.touches[0]:e;return (p.clientX-r.left)*W/r.width;}
+cv.addEventListener("mousemove",function(e){ship.x=pos(e);});
+cv.addEventListener("touchmove",function(e){e.preventDefault();ship.x=pos(e);},{passive:false});
+cv.addEventListener("touchstart",function(e){e.preventDefault();ship.x=pos(e);fire();},{passive:false});
+cv.addEventListener("mousedown",function(e){ship.x=pos(e);fire();});
+keyH=function(e){if(e.code==="Space"){e.preventDefault();fire();}keys[e.key]=e.type;};addEventListener("keydown",keyH);
+var keyU=function(e){keys[e.key]=null;};addEventListener("keyup",keyU);
+function fire(){if(over||cool>0)return;cool=.18;bullets.push({x:ship.x,y:H-60});SFX.shot();}
+function lose(text){lives--;SFX.bad();msg=text;msgT=1.8;if(q)mark(q.c.i,false);if(lives<=0){over=true;removeEventListener("keyup",keyU);timers.push(setTimeout(function(){endGame("shoot",score,"Level "+level+" bereikt, "+hits+" keer raak!");},900));}else round();}
+function boom(x,y,col){for(var i=0;i<30;i++){var a=Math.random()*6.28,s=60+Math.random()*200;booms.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:.8,c:col});}}
+round();
+function loop(ts){var dt=Math.min((ts-(last||ts))/1000,.05);last=ts;cool-=dt;
+ if(keys.ArrowLeft==="keydown")ship.x-=500*dt;if(keys.ArrowRight==="keydown")ship.x+=500*dt;ship.x=Math.max(30,Math.min(W-30,ship.x));
+ var sp=35+level*12;
+ if(!over){bullets.forEach(function(b){b.y-=700*dt;});bullets=bullets.filter(function(b){return b.y>-10;});
+ for(var t=0;t<targets.length;t++){var o=targets[t];o.y+=sp*dt;o.ph+=dt*2;o.x+=Math.sin(o.ph)*20*dt+o.vx*dt;o.x=Math.max(70,Math.min(W-70,o.x));}
+ outer:for(var bi=bullets.length-1;bi>=0;bi--){for(var ti=0;ti<targets.length;ti++){var tg=targets[ti],b=bullets[bi];if(Math.abs(b.x-tg.x)<70&&Math.abs(b.y-tg.y)<28){bullets.splice(bi,1);
+  if(tg.ok){score+=10*level;hits++;mark(q.c.i,true);SFX.boom();SFX.ok();boom(tg.x,tg.y,"#ffd32a");msg="Raak! "+q.c.vlag+" "+q.c.land+" → "+q.c.stad;msgT=1.6;if(hits%4===0)level++;round();}
+  else{boom(tg.x,tg.y,"#ff4757");lose("Fout! "+q.c.land+" → "+q.c.stad);}break outer;}}}
+ if(!over)for(var m=0;m<targets.length;m++)if(targets[m].ok&&targets[m].y>H-70){lose("Gemist! "+q.c.land+" → "+q.c.stad);break;}}
+ booms.forEach(function(p){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;});booms=booms.filter(function(p){return p.l>0;});msgT-=dt;
+ // draw
+ g.fillStyle="#0b1026";g.fillRect(0,0,W,H);g.fillStyle="#fff";stars2.forEach(function(s){s.y+=s.s*20*dt;if(s.y>H)s.y=0;g.fillRect(s.x,s.y,s.s,s.s);});
+ targets.forEach(function(o){g.fillStyle="hsl("+o.hue+",80%,60%)";g.beginPath();g.ellipse(o.x,o.y,72,24,0,0,6.28);g.fill();g.fillStyle="rgba(180,240,255,.8)";g.beginPath();g.ellipse(o.x,o.y-16,26,16,0,3.14,6.28);g.fill();g.fillStyle="#fff";g.font="bold 19px Trebuchet MS";g.textAlign="center";g.textBaseline="middle";g.fillText(o.t,o.x,o.y+3);});
+ g.fillStyle="#ffd32a";bullets.forEach(function(b){g.beginPath();g.arc(b.x,b.y,5,0,6.28);g.fill();});
+ booms.forEach(function(p){g.globalAlpha=Math.max(p.l,0);g.fillStyle=p.c;g.fillRect(p.x,p.y,5,5);});g.globalAlpha=1;
+ g.font="40px sans-serif";g.textAlign="center";g.fillText("🚀",ship.x,H-30);
+ g.fillStyle="rgba(0,0,0,.6)";g.fillRect(0,0,W,46);g.fillStyle="#fff";g.font="bold 24px Trebuchet MS";g.fillText(q?q.short:"",W/2,24);
+ g.textAlign="left";g.font="bold 20px Trebuchet MS";g.fillText("❤️".repeat(Math.max(lives,0))+"  Score: "+score+"  Level: "+level,10,72);
+ if(msgT>0){g.textAlign="center";g.fillStyle="#ffd32a";g.font="bold 22px Trebuchet MS";g.fillText(msg,W/2,H/2);}
+ if(over){g.textAlign="center";g.fillStyle="#ff6b6b";g.font="bold 50px Trebuchet MS";g.fillText("GAME OVER",W/2,H/2-50);}
+ raf=requestAnimationFrame(loop);}
+raf=requestAnimationFrame(loop);}
+// MEMORY
+function memory(){stopAll();var pick=sh(C).slice(0,8),cards=[];pick.forEach(function(c){cards.push({i:c.i,t:c.vlag+" "+c.land});cards.push({i:c.i,t:"🏛️ "+c.stad});});cards=sh(cards);
+var open=[],moves=0,found=0,t0=Date.now(),lock=false;
+app.innerHTML=hdr("🃏 Memory",'')+'<div class="panel"><div class="mem" id="mg">'+cards.map(function(c,j){return '<div class="mc" data-j="'+j+'">❓</div>';}).join("")+'</div></div>';wire();
+function info(){$("info").textContent="Zetten: "+moves+" · ⏱️ "+Math.floor((Date.now()-t0)/1000)+"s";}info();timers.push(setInterval(info,500));
+Array.prototype.forEach.call(document.querySelectorAll(".mc"),function(el){el.onclick=function(){var j=+el.dataset.j;if(lock||el.classList.contains("open")||el.classList.contains("done"))return;el.classList.add("open");el.textContent=cards[j].t;tone(500,.06);open.push(el);
+ if(open.length===2){moves++;var a=cards[+open[0].dataset.j],b=cards[+open[1].dataset.j];if(a.i===b.i){SFX.ok();mark(a.i,true);open.forEach(function(x){x.classList.add("done");});open=[];found++;
+  if(found===8){var s=Math.floor((Date.now()-t0)/1000);var score=Math.max(10,1000-moves*20-s*5);timers.push(setTimeout(function(){endGame("memory",score,moves+" zetten in "+s+" seconden");},600));}}
+ else{lock=true;var pr=open;open=[];timers.push(setTimeout(function(){pr.forEach(function(x){x.classList.remove("open");x.textContent="❓";});lock=false;},900));}}info();};});}
+// RACE + WAAR/NIET WAAR
+function race(mode){stopAll();var left=60,score=0,streak=0;
+app.innerHTML=hdr(mode==="race"?"⏱️ Tijdrace":"✅ Waar of niet waar",'')+'<div class="panel" id="rp"></div>';wire();
+function info(){$("info").textContent="⏱️ "+left+"s · ⭐ "+score;}info();
+timers.push(setInterval(function(){left--;info();if(left<=0){stopAll();endGame(mode,score,"in 60 seconden!");}},1000));
+function next(){var p=$("rp");if(!p)return;var c=C[Math.floor(Math.random()*27)];
+ if(mode==="race"){var opts=sh([c].concat(sh(C.filter(function(x){return x.i!==c.i;})).slice(0,3)));p.innerHTML='<div class="flag">'+c.vlag+'</div><div class="q">'+c.land+'</div><div class="opts">'+opts.map(function(o){return '<button class="opt" data-i="'+o.i+'">'+o.stad+'</button>';}).join("")+'</div>';
+  Array.prototype.forEach.call(p.querySelectorAll(".opt"),function(b){b.onclick=function(){ans(c,+b.dataset.i===c.i);};});}
+ else{var tr=Math.random()<.5,s=tr?c:sh(C.filter(function(x){return x.i!==c.i;}))[0];p.innerHTML='<div class="flag">'+c.vlag+'</div><div class="q">De hoofdstad van '+c.land+' is '+s.stad+'.</div><div class="opts"><button class="opt ok" id="yes">👍 Waar</button><button class="opt bad" id="no">👎 Niet waar</button></div>';
+  $("yes").onclick=function(){ans(c,tr);};$("no").onclick=function(){ans(c,!tr);};}}
+function ans(c,ok){if(left<=0)return;mark(c.i,ok);if(ok){streak++;score+=1+(streak>=5?1:0);SFX.ok();}else{streak=0;SFX.bad();var p=$("rp");p.classList.remove("shake");void p.offsetWidth;p.classList.add("shake");}info();next();}
+next();}
+// PROGRESS
+function progress(){stopAll();var p=ST.get("prog",{});app.innerHTML=hdr("⭐ Mijn sterren")+'<div class="panel"><p>Elk goed antwoord brengt je dichter bij 3 sterren!</p><table><tr><th></th><th>Land</th><th>Hoofdstad</th><th>Sterren</th><th>✔/✘</th></tr>'+
+C.slice().sort(function(a,b){return stars(a.i)-stars(b.i);}).map(function(c){var r=p[c.i]||{g:0,f:0},s=stars(c.i);return '<tr><td>'+c.vlag+'</td><td>'+c.land+'</td><td>'+(r.g?c.stad:"???")+'</td><td class="stars">'+"★".repeat(s)+"☆".repeat(3-s)+'</td><td>'+r.g+"/"+r.f+'</td></tr>';}).join("")+'</table><button class="btn" id="rs">Alles wissen</button></div>';wire();
+$("rs").onclick=function(){if(confirm("Weet je zeker dat je alle sterren wilt wissen?")){ST.set("prog",{});progress();}};}
+function showScores(hl){stopAll();app.innerHTML=hdr("🏆 Topscores")+'<div class="grid">'+Object.keys(MODES).map(function(m){var l=hs(m);return '<div class="panel" style="'+(m===hl?"outline:5px solid #f9a825":"")+'"><b style="font-size:22px">'+MODES[m]+'</b><table>'+(l.length?l.map(function(e,k){return '<tr><td>'+["🥇","🥈","🥉","4.","5."][k]+'</td><td>'+esc(e.n)+'</td><td><b>'+e.s+'</b></td></tr>';}).join(""):'<tr><td>Nog geen scores</td></tr>')+'</table></div>';}).join("")+'</div>';wire();}
+window.__T={C:C,makeQ:makeQ,quiz:quiz,shooter:shooter,memory:memory,race:race,learn:learn,progress:progress,showScores:showScores,endGame:endGame,home:home,stars:stars};
+home();
+</script></body></html>
