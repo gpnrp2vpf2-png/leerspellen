@@ -224,17 +224,43 @@ function download(name,text){var b=new Blob([text],{type:"text/plain;charset=utf
 function importText(text,fname){var m=/^#\s*Lijst:\s*(.+)$/m.exec(text);var name=m?m[1].trim():(fname||"Geïmporteerde lijst").replace(/\.[^.]+$/,"");var pairs=parseText(text);if(!pairs.length)return null;var l=mkList(name,pairs,true);DB.lists.push(l);save();return l;}
 function wordsHome(){stopAll();ovClose();
 app.innerHTML=hdr("📝 Mijn woorden",activeWords().length+" actieve woorden")+'<div class="panel"><p style="font-size:18px">Zet een vinkje bij de lijsten waarmee je wilt spelen. Tik op ✏️ om woorden toe te voegen.</p><div id="lists">'+
-(DB.lists.length?DB.lists.map(function(l){return '<div class="lrow"><label style="font-size:28px"><input type="checkbox" class="act" data-id="'+l.id+'" '+(l.active?"checked":"")+' style="width:28px;height:28px"></label><span class="nm">'+esc(l.name)+' <small>('+l.words.length+' woorden)</small></span><button class="btn sm" data-a="open" data-id="'+l.id+'">✏️ Woorden</button><button class="btn sm" data-a="ren" data-id="'+l.id+'">🏷️ Naam</button><button class="btn sm" data-a="exp" data-id="'+l.id+'">💾 Bewaar</button><button class="btn sm" data-a="del" data-id="'+l.id+'">🗑️</button></div>';}).join(""):'<p>Nog geen lijsten. Maak er een!</p>')+
-'</div><button class="big c3" id="nl" style="margin-top:12px">➕ Nieuwe lijst</button> <button class="big c4" id="imp">📂 Lijst openen (.txt)</button><input type="file" id="fp" accept=".txt,text/plain" style="display:none"></div>';wire();
+(DB.lists.length?DB.lists.map(function(l){return '<div class="lrow"><label style="font-size:28px"><input type="checkbox" class="act" data-id="'+l.id+'" '+(l.active?"checked":"")+' style="width:28px;height:28px"></label><span class="nm">'+esc(l.name)+' <small>('+l.words.length+' woorden)</small></span><button class="btn sm" data-a="open" data-id="'+l.id+'">✏️ Woorden</button><button class="btn sm" data-a="ren" data-id="'+l.id+'">🏷️ Naam</button><button class="btn sm" data-a="exp" data-id="'+l.id+'">💾 Bewaar</button><button class="btn sm" data-a="share" data-id="'+l.id+'">'+(l.sid&&l.sg===onGet("groep")?"⬆️ Bijwerken":"🌐 Deel")+'</button><button class="btn sm" data-a="del" data-id="'+l.id+'">🗑️</button></div>';}).join(""):'<p>Nog geen lijsten. Maak er een!</p>')+
+'</div><button class="big c3" id="nl" style="margin-top:12px">➕ Nieuwe lijst</button> <button class="big c4" id="imp">📂 Lijst openen (.txt)</button><input type="file" id="fp" accept=".txt,text/plain" style="display:none"></div><div class="panel" id="shared" style="margin-top:14px"></div>';wire();shLoad();
 qa(".act").forEach(function(c){c.onchange=function(){getList(c.dataset.id).active=c.checked;save();$("info").textContent=activeWords().length+" actieve woorden";};});
 qa("[data-a]").forEach(function(b){b.onclick=function(){var l=getList(b.dataset.id),a=b.dataset.a;
  if(a==="open")listEdit(l.id);
  else if(a==="ren")ask("Nieuwe naam",[{label:"Naam van de lijst",value:l.name}],function(v){l.name=v[0];save();wordsHome();});
  else if(a==="exp")download(l.name,exportText(l));
+ else if(a==="share")shShare(l);
  else if(a==="del"){if(confirm("Lijst '"+l.name+"' met "+l.words.length+" woorden wissen?")){DB.lists=DB.lists.filter(function(x){return x!==l;});save();wordsHome();}}};});
 $("nl").onclick=function(){ask("Nieuwe lijst",[{label:"Naam (bv. Les 3 - dieren)",value:""}],function(v){var l=mkList(v[0],[],true);DB.lists.push(l);save();listEdit(l.id);});};
 $("imp").onclick=function(){$("fp").click();};
 $("fp").onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var l=importText(String(rd.result),f.name);if(l){SFX.ok();ov('<div class="q">Gelukt! 🎉</div><p>Lijst <b>'+esc(l.name)+'</b> met '+l.words.length+' woorden is toegevoegd.</p><button class="btn" id="ok">OK</button>');$("ok").onclick=function(){ovClose();wordsHome();};}else{ov('<div class="q">Hmm 🤔</div><p>Ik vond geen woorden in dit bestand. Elke regel moet zo zijn: <b>le chien = de hond</b></p><button class="btn" id="ok">OK</button>');$("ok").onclick=ovClose;}};rd.readAsText(f,"utf-8");};}
+// ---------- GEDEELDE LIJSTEN (Supabase) ----------
+var SB_WL="https://crkkxqymzmwaxtaigkyy.supabase.co/rest/v1/word_lists";
+function shWords(l){return l.words.filter(function(w){return w.fr&&w.nl;}).slice(0,300).map(function(w){return {fr:String(w.fr).trim().slice(0,100),nl:String(w.nl).trim().slice(0,100)};}).filter(function(w){return w.fr&&w.nl;});}
+function shApply(l,r){var old={};(l.words||[]).forEach(function(w){old[norm(w.fr)+"|"+norm(w.nl)]=w.id;});l.name=r.title;l.sid=r.id;l.sg=r.group_code;l.su=r.updated_at;l.by=r.created_by;
+l.words=(r.words||[]).map(function(w){return {id:old[norm(w.fr)+"|"+norm(w.nl)]||uid(),fr:w.fr,nl:w.nl};});}
+function shShare(l){if(!onReady()){onSettings();return;}var g=onGet("groep"),ws=shWords(l);
+if(!ws.length){ov('<div class="q">Oeps 🙈</div><p>Deze lijst heeft nog geen woorden.</p><button class="btn" id="ok">OK</button>');$("ok").onclick=ovClose;return;}
+var upd=l.sid&&l.sg===g,body={title:String(l.name||"Lijst").trim().slice(0,60)||"Lijst",words:ws};if(!upd){body.group_code=g;body.created_by=onGet("nick");}
+ov('<div class="q">Even geduld… ⏳</div>');
+fetch(SB_WL+(upd?"?id=eq."+l.sid+"&group_code=eq."+encodeURIComponent(g):""),{method:upd?"PATCH":"POST",headers:{apikey:SB_KEY,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(body)})
+.then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(a){if(!a||!a[0])throw 0;shApply(l,a[0]);save();SFX.ok();
+ov('<div class="q">Gedeeld! 🎉</div><p>Iedereen met groepscode <b>'+onEsc(g)+'</b> kan <b>'+esc(l.name)+'</b> nu spelen.</p><button class="btn" id="ok">OK</button>');$("ok").onclick=function(){ovClose();wordsHome();};})
+.catch(function(){ov('<div class="q">Hmm 🤔</div><p>Delen lukte niet. Is er internet? Probeer straks opnieuw.</p><button class="btn" id="ok">OK</button>');$("ok").onclick=ovClose;});}
+function shLoad(){var box=$("shared");if(!box)return;if(!onReady()){box.innerHTML='<p style="font-size:18px">🌐 Wil je lijsten delen met je klas of familie? Stel eerst een bijnaam en groepscode in bij <b>⚙️ Online spelen</b>.</p><button class="btn" id="shSet">⚙️ Online spelen</button>';$("shSet").onclick=onSettings;return;}
+var g=onGet("groep");box.innerHTML='<h3>🌐 Gedeelde lijsten van groep '+onEsc(g)+'</h3><p>Laden… ⏳</p>';
+fetch(SB_WL+"?select=id,group_code,title,words,created_by,updated_at&group_code=eq."+encodeURIComponent(g)+"&order=updated_at.desc&limit=100",{headers:{apikey:SB_KEY}}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(rows){
+var changed=false;rows.forEach(function(r){DB.lists.forEach(function(l){if(l.sid===r.id&&l.sg===g&&l.su!==r.updated_at){shApply(l,r);changed=true;}});});if(changed){save();var lt=$("lists");if(lt){wordsHome();return;}}
+box=$("shared");if(!box)return;
+box.innerHTML='<h3>🌐 Gedeelde lijsten van groep '+onEsc(g)+'</h3>'+(rows.length?rows.map(function(r,i){var mine=DB.lists.some(function(l){return l.sid===r.id&&l.sg===g;});
+return '<div class="lrow"><span class="nm">'+esc(r.title)+' <small>('+r.words.length+' woorden · van '+esc(r.created_by)+')</small></span><button class="btn sm" data-sh="play" data-i="'+i+'">▶️ Speel</button><button class="btn sm" data-sh="copy" data-i="'+i+'">📥 Kopie</button>'+(mine?'<small>✅ in jouw lijsten</small>':'')+'</div>';}).join(""):'<p>Nog geen gedeelde lijsten. Tik bij een lijst op <b>🌐 Deel</b>!</p>');
+qa("[data-sh]").forEach(function(b){b.onclick=function(){var r=rows[+b.dataset.i];
+ if(b.dataset.sh==="copy"){var c=mkList(r.title+" (kopie)",r.words.map(function(w){return [w.fr,w.nl];}),false);DB.lists.push(c);save();SFX.ok();ov('<div class="q">Gekopieerd! 📥</div><p><b>'+esc(c.name)+'</b> staat nu bij jouw eigen lijsten. Die kan je zelf aanpassen.</p><button class="btn" id="ok">OK</button>');$("ok").onclick=function(){ovClose();wordsHome();};return;}
+ var l=DB.lists.filter(function(x){return x.sid===r.id&&x.sg===g;})[0];if(!l){l={id:uid(),name:r.title,active:true,words:[]};DB.lists.push(l);}shApply(l,r);DB.lists.forEach(function(x){x.active=(x===l);});save();SFX.ok();
+ ov('<div class="q">Klaar om te spelen! 🎮</div><p>Alleen <b>'+esc(l.name)+'</b> staat nu aan. Kies een spel in het menu.</p><button class="btn" id="ok">🏠 Naar het menu</button>');$("ok").onclick=function(){ovClose();home();};};});
+}).catch(function(){var b2=$("shared");if(b2)b2.innerHTML='<h3>🌐 Gedeelde lijsten van groep '+onEsc(g)+'</h3><p>😴 Even geen verbinding. Je eigen lijsten werken gewoon!</p>';});}
 function listEdit(id){stopAll();var l=getList(id);if(!l)return wordsHome();
 app.innerHTML=hdr("✏️ "+esc(l.name),'<span id="cnt"></span>')+'<div class="panel">'+
 '<div class="row2"><input id="fr" placeholder="🇫🇷 Frans (bv. le chien)" autocomplete="off" autocapitalize="off" spellcheck="false"><input id="nlw" placeholder="🇧🇪 Nederlands (bv. de hond)" autocomplete="off" spellcheck="false"><button class="plus" id="add" title="Toevoegen">+</button></div>'+accBar()+'<div class="fact" id="fb">Tip: druk op Enter om snel toe te voegen.</div>'+
